@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 
 function App() {
   // Initialize form state with default values
   const [formData, setFormData] = useState({
-    date: '',
-    landlordName: '',
-    landlordAddress: '',
-    tenantName: '',
-    tenantAddress: '',
-    propertyAddress: '',
-    propertyDescription: '',
-    rentAmount: '',
-    dueDate: '',
-    securityDepositAmount: '',
-    utilities: '',
-    startDate: '',
-    noticePeriod: '',
-    petsAllowed: '',
-    governingLaw: '',
+    date: "",
+    landlordName: "",
+    landlordAddress: "",
+    tenantName: "",
+    tenantAddress: "",
+    propertyAddress: "",
+    propertyDescription: "",
+    rentAmount: "",
+    dueDate: "",
+    securityDepositAmount: "",
+    utilities: "",
+    startDate: "",
+    noticePeriod: "",
+    petsAllowed: "",
+    governingLaw: "",
   });
 
   const [downloadLink, setDownloadLink] = useState(null);
@@ -38,25 +38,38 @@ function App() {
     event.preventDefault();
 
     // Send formData as JSON to the backend
-    fetch('http://127.0.0.1:5000/api/generate_rental_agreement', {
-      method: 'POST',
+    fetch("http://127.0.0.1:5000/api/generate_rental_agreement", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.blob())
-      .then((blob) => {
-        // Create a URL for the generated PDF blob
-        const url = window.URL.createObjectURL(blob);
-
-        // Update the download link state with the generated URL
-        setDownloadLink(url);
+      .then((response) => response.json()) // Parse the response as JSON
+      .then((data) => {
+        // Check if the response contains a download link
+        if (data.downloadLink) {
+          // Update the download link state with the generated URL
+          setDownloadLink(data.downloadLink);
+        }
       })
       .catch((error) => {
         console.error(error);
       });
   };
+
+    // Function to handle clicking the "Download Agreement" button
+    const handleDownloadClick = () => {
+      // Trigger the download link programmatically
+      if (downloadLink) {
+        const a = document.createElement('a');
+        a.href = downloadLink;
+        a.download = 'rental_agreement.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    };
 
   return (
     <div className="App">
@@ -226,13 +239,13 @@ function App() {
 
         {/* Download Button */}
         {downloadLink && (
-          <a
-            href={downloadLink}
-            download="rental_agreement.pdf"
-            className="btn btn-success mt-3"
+          <Button
+            variant="success"
+            className="mt-3"
+            onClick={handleDownloadClick}
           >
             Download Agreement
-          </a>
+          </Button>
         )}
       </Container>
     </div>

@@ -1,4 +1,5 @@
 import logging
+from flask_cors import CORS
 import os
 from flask import Flask, Blueprint, request, jsonify, send_from_directory, send_file
 from jinja2 import Template
@@ -14,6 +15,7 @@ logging.basicConfig(level=logging.ERROR)  # Set the log level as needed
 
 # Create a blueprint
 documentAI = Blueprint('documentAI', __name__)
+CORS(documentAI)
 
 # Define your routes
 @documentAI.route('/')
@@ -76,8 +78,8 @@ def generate_rental_agreement():
     try:
         # Get user input as JSON data from the POST request
         user_input = request.get_json()
+        print('userInput', user_input)
 
-        
 
         # Create a Jinja2 template from the rental agreement template
         template = Template(rental_agreement_template)
